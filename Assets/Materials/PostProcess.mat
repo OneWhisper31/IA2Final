@@ -97,7 +97,7 @@ Material:
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.005
-    - _PixelAspectRatio: 149
+    - _PixelAspectRatio: 147
     - _Pixels: 149
     - _PixelsX: 458.43
     - _PixelsY: 259
