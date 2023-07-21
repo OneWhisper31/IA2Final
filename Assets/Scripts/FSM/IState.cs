@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 
 namespace FSM {
-
     public interface IState {
 
         event Action     OnNeedsReplan;

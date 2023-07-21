@@ -9,22 +9,37 @@ public abstract class Character : Entity
 {
     FiniteStateMachine fsm;
 
-    public abstract List<Tuple<string,IState,IState>> SetTransitions();//autocompletedInChilds
+
+    [SerializeField] List<TransitionMono> transitions = new List<TransitionMono>();
+
+    public virtual TransitionMono[] SetTransitions()
+    {
+        return transitions.ToArray();//IA2-LINQ
+    }
 
     public void Awake()
     {
         var transitions = SetTransitions();
 
-        if (transitions.Count > 0)
-            fsm = ConfigureFSM(transitions.First().Item2, StartCoroutine, transitions);//IA2-LINQ
+        if (transitions.Length > 0)
+            fsm = ConfigureFSM(transitions.First().from, StartCoroutine, transitions);//IA2-LINQ
+        fsm.Active = true;
     }
 
     public static FiniteStateMachine
-        ConfigureFSM(IState initialState, Func<IEnumerator, Coroutine> startCoroutine, List<Tuple<string, IState, IState>> transitions)
+        ConfigureFSM(IState initialState, Func<IEnumerator, Coroutine> startCoroutine, TransitionMono[] transitions)
         => transitions.Aggregate(new FiniteStateMachine(initialState, startCoroutine),(x,y)=> {//IA2-LINQ
 
-            x.AddTransition("On" + y.Item1, y.Item2, y.Item3);
+            x.AddTransition("On" + y.name, y.from, y.to);
 
             return x;
     });
+}
+[Serializable]
+public struct TransitionMono
+{
+    public string name { get => from.name; }
+
+    public MonoBaseState from;
+    public MonoBaseState to;
 }
