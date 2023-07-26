@@ -6,6 +6,12 @@ namespace FSM.Looter
 {
     public class LooterAttackState : MonoBaseState
     {
+        public override void Enter(IState from, Dictionary<string, object> transitionParameters = null)
+        {
+            base.Enter(from, transitionParameters);
+            animator.SetBool("isStealing", false);
+            animator.SetBool("isAttacking", false);
+        }
         public override IState ProcessInput()
         {
             return this;
@@ -13,7 +19,7 @@ namespace FSM.Looter
 
         public override void UpdateLoop()
         {
-
+            Debug.Log("attack");
         }
     }
 

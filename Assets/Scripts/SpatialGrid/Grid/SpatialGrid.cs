@@ -68,6 +68,7 @@ public class SpatialGrid : MonoBehaviour {
     }
 
     public void Add(IGridEntity entity) {
+        Debug.Log(entity.GetType().Name);
         entity.OnMove += UpdateEntity;
         UpdateEntity(entity);
     }

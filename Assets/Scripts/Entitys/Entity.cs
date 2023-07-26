@@ -13,7 +13,7 @@ public abstract class Entity : MonoBehaviour, IDamageable, IGridEntity
 
     public event Action<IGridEntity> OnMove;
 
-    CircleQuery circleQuery;
+    public CircleQuery circleQuery;
 
     protected Action OnUpdate,OnFixedUpdate;
 

@@ -10,6 +10,9 @@ namespace FSM {
 
         public event StateEvent OnEnter;
         public event StateEvent OnExit;
+
+        protected Animator animator;
+        protected Character myCharacter;
         
         public virtual string Name => GetType().Name;
 
@@ -21,6 +24,10 @@ namespace FSM {
 
         private FiniteStateMachine _fsm;
 
+        private void Awake() { 
+            animator = GetComponent<Animator>();
+            myCharacter = GetComponent<Character>();
+        }
 
         public IState Configure(FiniteStateMachine fsm) {
             _fsm            =  fsm;

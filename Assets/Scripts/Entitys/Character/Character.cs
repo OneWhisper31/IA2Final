@@ -30,7 +30,7 @@ public abstract class Character : Entity
         ConfigureFSM(IState initialState, Func<IEnumerator, Coroutine> startCoroutine, TransitionMono[] transitions)
         => transitions.Aggregate(new FiniteStateMachine(initialState, startCoroutine),(x,y)=> {//IA2-LINQ
 
-            x.AddTransition("On" + y.name, y.from, y.to);
+            x.AddTransition(y.Name, y.from, y.to);
 
             return x;
     });
@@ -38,7 +38,8 @@ public abstract class Character : Entity
 [Serializable]
 public struct TransitionMono
 {
-    public string name { get => from.name; }
+    [SerializeField] string name;
+    public string Name { get => "On" + name; }
 
     public MonoBaseState from;
     public MonoBaseState to;
