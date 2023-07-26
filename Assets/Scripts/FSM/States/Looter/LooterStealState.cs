@@ -67,7 +67,7 @@ namespace FSM.Looter
                 return Transitions["OnFull"];
             else if(myCharacter.circleQuery.Query().Select(x=>(Character)x)
                     .Where(x=>x.gameObject!=this.gameObject).Any(x=>x!=null)//IA2-LINQ
-                        && Transitions.ContainsKey("OnAttack"))
+                    && Transitions.ContainsKey("OnAttack"))
                 return Transitions["OnAttack"];
 
             return this;

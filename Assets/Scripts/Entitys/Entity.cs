@@ -7,8 +7,10 @@ using UnityEngine;
 [RequireComponent(typeof(CircleQuery))]
 public abstract class Entity : MonoBehaviour, IDamageable, IGridEntity
 {
+    public int Health { get=>health; }
+    public bool IsDead { get => health <= 0; }
+    [SerializeField] int health=100;
 
-    public int health { get; private set; }
     public Vector3 Position { get => transform.position; set => transform.position = value; }
 
     public event Action<IGridEntity> OnMove;
@@ -36,7 +38,7 @@ public abstract class Entity : MonoBehaviour, IDamageable, IGridEntity
     {
         health -= damage;
 
-        if (health < 0)
+        if (health <= 0)
             OnDeadEvent();
     }
 
@@ -47,6 +49,7 @@ public abstract class Entity : MonoBehaviour, IDamageable, IGridEntity
 
     public virtual void OnDeadEvent()
     {
-        Destroy(this.gameObject);
+        gameObject.SetActive(false);
+        transform.position = GameManager.gm.deadPivot.position;
     }
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public interface IDamageable
 {
-    public int health { get;}
+    public abstract int Health { get; }
 
     public abstract void OnTakeDamage (int damage);
     public abstract void OnHealEvent  (int heal);
