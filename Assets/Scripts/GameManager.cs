@@ -7,6 +7,7 @@ public class GameManager : MonoBehaviour
     public static GameManager gm{ get; private set; }
 
     public Transform deadPivot;
+    public LayerMask wallLayer;
 
     // Start is called before the first frame update
     void Awake()

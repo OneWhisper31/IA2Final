@@ -9,7 +9,7 @@ public class Node : MonoBehaviour
     public Node[] neighbours;
     void Start()
     {
-        neighbours = Physics.OverlapSphere(transform.position, 0.5f).Where(x => x.GetComponent<Node>() != null).Select(x => x.GetComponent<Node>())
+        neighbours = Physics.OverlapSphere(transform.position, 0.6f).Where(x => x.GetComponent<Node>() != null).Select(x => x.GetComponent<Node>())
                                                                  .Where(x => x != this).ToArray();
     }
 
