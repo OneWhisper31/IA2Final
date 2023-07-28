@@ -19,7 +19,6 @@ public class test : MonoBehaviour
     }*/
     [SerializeField] Node start;
     [SerializeField] Node end;
-    bool once;
 
     private void Start()
     {
@@ -42,9 +41,5 @@ public class test : MonoBehaviour
         {
             Debug.Log(item.name);
         }
-    }
-    private void Update()
-    {
-        
     }
 }

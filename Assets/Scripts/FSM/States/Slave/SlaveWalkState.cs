@@ -13,7 +13,7 @@ namespace FSM.Slave
 
         public override void UpdateLoop()
         {
-            Debug.Log("Slave");
+            //Debug.Log("Slave");
         }
     }
 

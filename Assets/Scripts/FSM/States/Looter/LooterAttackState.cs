@@ -15,11 +15,19 @@ namespace FSM.Looter
 
         bool isAttacking;
 
+        CapsuleCollider capsule;
+        bool noenemies;
+
         public override void Enter(IState from, Dictionary<string, object> transitionParameters = null)
         {
             base.Enter(from, transitionParameters);
             animator.SetBool("isStealing", false);
             animator.SetBool("isAttacking", false);
+
+            if (capsule == null)
+                capsule = GetComponent<CapsuleCollider>();
+
+            noenemies = false;
         }
         public override void UpdateLoop()
         {//IA2-LINQ
@@ -31,14 +39,20 @@ namespace FSM.Looter
                  .Concat(
             query.Where(x => x.GetType() == typeof(Guard.Guard)).Select(x => Tuple.Create(x, 1)))
                  .OrderBy(x => x.Item2).ThenBy(x => (myCharacter.Position - x.Item1.Position).magnitude)
+
                  .Select(x => x.Item1)
+                 .Where(x=> transform.position
+                        .CanPassThrough(x.transform.position, capsule.radius, capsule.height, GameManager.gm.wallLayer))
                  .Take(1)
                  .ToArray();
 
             if (entitys.Length >= 1)
                 target = entitys[0];
             else
+            {
+                noenemies = true;
                 return;
+            }
 
             Vector3 dir = target.Position - myCharacter.Position;
             dir.y = 0;
@@ -67,14 +81,10 @@ namespace FSM.Looter
                 return;
 
             target.OnTakeDamage(damage);
-            /*if (target.GetType()==typeof(Slave.Slave))
-                ((Slave.Slave)target).OnTakeDamage(damage);
-            else if (target.GetType() == typeof(Guard.Guard))
-                ((Guard.Guard)target).OnTakeDamage(damage);*/
         }
         public override IState ProcessInput()
         {
-            if (target != null && target.IsDead && Transitions.ContainsKey("OnSteal"))
+            if ((target != null && target.IsDead)|| noenemies && Transitions.ContainsKey("OnSteal"))
                 return Transitions["OnSteal"];
 
             return this;

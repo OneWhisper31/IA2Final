@@ -34,6 +34,22 @@ public abstract class Character : Entity
 
             return x;
     });
+
+    //A*
+    public List<Node> GenerateStartNEnd(Transform startPos, Transform endPos)
+    {//IA2-LINQ
+        List<Node> nodes = new List<Node>();
+
+        nodes.Add(Physics.OverlapSphere(startPos.position, 1f).Where(x => x.GetComponent<Node>() != null)
+            .Select(x => x.GetComponent<Node>()).OrderBy(x => (startPos.position - x.transform.position).magnitude)
+            .First());
+
+        nodes.Add(Physics.OverlapSphere(endPos.position, 1f).Where(x => x.GetComponent<Node>() != null)
+            .Select(x => x.GetComponent<Node>()).OrderBy(x => (endPos.position - x.transform.position).magnitude)
+            .First());
+
+        return nodes;
+    }
 }
 [Serializable]
 public struct TransitionMono
