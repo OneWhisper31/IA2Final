@@ -1,20 +1,130 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 namespace FSM.Slave
 {
     public class SlaveWalkState : MonoBaseState
     {
-        public override IState ProcessInput()
+        [SerializeField] Transform house;
+        public Transform guard;
+        CapsuleCollider capsule;
+
+        List<Transform> path = new List<Transform>();
+        Transform target;
+
+        [SerializeField] float speed;
+
+        bool isWaitingForPath;
+        bool hasArrive;
+
+        public override void Enter(IState from, Dictionary<string, object> transitionParameters = null)
         {
-            return this;
+            base.Enter(from, transitionParameters);
+            animator.SetBool("isMining", false);
+
+            hasArrive = false;
+
+            StartCoroutine(SetGuard());
+
+            if (capsule == null)
+                capsule = GetComponent<CapsuleCollider>();
+
+        }
+        IEnumerator SetGuard()
+        {
+            yield return new WaitForSecondsRealtime(0.1f);
+            var query = myCharacter.circleQuery.Query().Where(x => x.GetType() == typeof(Guard.Guard)).Cast<Guard.Guard>();
+            if (query.Count() > 0)
+            {
+                guard= query.OrderBy(x => (transform.position - x.transform.position).magnitude).First().transform;
+            }
+            else
+            {
+                guard = house;
+                yield return new WaitForSecondsRealtime(4f);
+                query = myCharacter.circleQuery.Query().Where(x => x.GetType() == typeof(Guard.Guard)).Cast<Guard.Guard>();
+                if (query.Count() > 0)
+                {
+                    guard = query.OrderBy(x => (transform.position - x.transform.position).magnitude).First().transform;
+                }
+            }
         }
 
         public override void UpdateLoop()
         {
-            //Debug.Log("Slave");
+            if (guard == null)
+                return;
+
+            if ((transform.position - guard.position).magnitude < 1f)
+            {
+                if (house == guard)
+                    return;
+
+                hasArrive = true;
+                return;
+            }
+
+            if (transform.position.CanPassThrough(guard.position, capsule.radius, capsule.height, GameManager.gm.wallLayer))
+            {//if is in line of sight, clean the list and add house as target
+
+                target = guard;
+
+                if (path.Count > 0)
+                    path.Clear();
+            }
+            else
+            {
+                if (!isWaitingForPath && path.Count <= 0)
+                    GeneratePath();
+
+                if (path.Count > 0)
+                    target = path.First();
+                else
+                    target = null;
+            }
+
+            if (target != null)
+            {
+                Vector3 dir = target.position - transform.position;
+                dir.y = 0;
+
+                if (dir.magnitude < 0.5f && path.Count > 0)
+                {//IA2-LINQ
+                    path = path.Skip(1).ToList();//next Target
+                }
+
+                transform.position += dir.normalized * speed * Time.deltaTime;
+                transform.forward = dir;
+            }
+        }
+
+        public void GeneratePath()
+        {//IA2-LINQ
+
+            isWaitingForPath = true;
+            var nodes = myCharacter.GenerateStartNEnd(transform, guard);
+
+            //A*
+            StartCoroutine(AStar.CalculatePath(nodes.First(), (x) => x == nodes.Last(),
+            (x) => x.neighbours.Select(x => new WeightedNode<Node>(x, 1)),
+            x => x.heuristic,
+            x => {
+                path.Clear();
+                path = x.Select(x => x.transform).PrependAppend(transform, guard).ToList();//IA2-LINQ
+                target = path.First();
+                isWaitingForPath = false;
+            }
+            ));
+        }
+        public override IState ProcessInput()
+        {
+            if (hasArrive && Transitions.ContainsKey("OnGuard"))
+                return Transitions["OnGuard"];
+
+
+            return this;
         }
     }
-
 }

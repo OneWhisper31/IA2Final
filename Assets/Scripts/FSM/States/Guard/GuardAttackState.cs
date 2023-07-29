@@ -20,8 +20,8 @@ namespace FSM.Guard
         public override void Enter(IState from, Dictionary<string, object> transitionParameters = null)
         {
             base.Enter(from, transitionParameters);
-            animator.SetBool("isStealing", false);
             animator.SetBool("isAttacking", false);
+            animator.SetBool("isEscorting", false);
 
             if (capsule == null)
                 capsule = GetComponent<CapsuleCollider>();
@@ -31,7 +31,8 @@ namespace FSM.Guard
         public override void UpdateLoop()
         {//IA2-LINQ
             var entitys = myCharacter.circleQuery.Query()
-                .Select(x => (Looter.Looter)x)
+                .Select(x => (Character)x)
+                .Where(x => x.GetType() == typeof(Looter.Looter))
                 .Where(x => x != null)
                 .Where(x => transform.position
                         .CanPassThrough(x.transform.position, capsule.radius, capsule.height, GameManager.gm.wallLayer))

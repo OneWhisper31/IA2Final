@@ -7,7 +7,11 @@ namespace FSM.Guard
 {
     public class GuardIdleState : MonoBaseState
     {
-        public Slave.Slave slave;//handled by Slave
+        [SerializeField] float speed;
+        [SerializeField] Transform[] waypoints = { };
+
+        int index;
+        bool isWaiting;
         
         public override void Enter(IState from, Dictionary<string, object> transitionParameters = null)
         {
@@ -15,18 +19,47 @@ namespace FSM.Guard
             animator.SetBool("isAttacking", false);
             animator.SetBool("isEscorting", false);
 
-            if (slave!=null && slave.IsDead)
-                slave = null;
         }
 
-        public override void UpdateLoop(){}
+        public override void UpdateLoop(){
+            if (isWaiting)
+                return;
+            animator.SetBool("isEscorting", true);
+
+            Vector3 dir = waypoints[index].position - transform.position;
+            dir.y = 0;
+
+            if (dir.magnitude <= 1f)
+            {
+                StartCoroutine(WaitAction());
+                return;
+            }
+
+            transform.position += dir.normalized * speed * Time.deltaTime;
+            transform.forward = dir;
+        }
+        IEnumerator WaitAction()
+        {
+            if (index + 1 >= waypoints.Length)
+                index = 0;
+            else
+                index++;
+            animator.SetBool("isEscorting", false);
+
+            yield return new WaitForSecondsRealtime(1);
+            isWaiting = false;
+
+        }
+
 
         public override IState ProcessInput()
         {//IA2-LINQ
+            var query = myCharacter.circleQuery.Query().Select(x => (Character)x);
 
-            if (slave!=null&& Transitions.ContainsKey("OnEscort"))
+            if (query.Where(x => x.GetType() == typeof(Slave.Slave)).Count() >= 1 
+                && Transitions.ContainsKey("OnEscort"))
                 return Transitions["OnEscort"];
-            else if(myCharacter.circleQuery.Query().Where(x => x.GetType() == typeof(Looter.Looter)).ToArray().Length > 0 
+            if (query.Where(x => x.GetType() == typeof(Looter.Looter)).Count() >= 1
                 && Transitions.ContainsKey("OnAttack"))
                 return Transitions["OnAttack"];
 
