@@ -8,7 +8,7 @@ using System.Linq;
 public abstract class Character : Entity
 {
     FiniteStateMachine fsm;
-
+    [SerializeField] Transform respawnPoint;
 
     [SerializeField] List<TransitionMono> transitions = new List<TransitionMono>();
 
@@ -24,6 +24,34 @@ public abstract class Character : Entity
         if (transitions.Length > 0)
             fsm = ConfigureFSM(transitions.First().from, StartCoroutine, transitions);//IA2-LINQ
         fsm.Active = true;
+    }
+    public void Update()
+    {
+        if (IsDead)
+        {
+            fsm.Active = false;
+
+        }
+    }
+    public override void OnDeadEvent()
+    {
+        fsm.Active = false;
+        transform.position = GameManager.gm.deadPivot.position;
+        StartCoroutine(Respawn());
+
+    }
+    public IEnumerator Respawn()
+    {
+        yield return new WaitForSecondsRealtime(UnityEngine.Random.Range(5,16));
+        transform.position = respawnPoint.position;
+
+        var transitions = SetTransitions();
+
+        if (transitions.Length > 0)
+            fsm = ConfigureFSM(transitions.First().from, StartCoroutine, transitions);//IA2-LINQ
+        fsm.Active = true;
+
+        OnFullHealEvent();
     }
 
     public static FiniteStateMachine

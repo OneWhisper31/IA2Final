@@ -18,6 +18,7 @@ namespace FSM.Guard
             base.Enter(from, transitionParameters);
             animator.SetBool("isAttacking", false);
             animator.SetBool("isEscorting", false);
+            animator.speed = 1;
 
         }
 
@@ -54,14 +55,16 @@ namespace FSM.Guard
 
         public override IState ProcessInput()
         {//IA2-LINQ
-            var query = myCharacter.circleQuery.Query().Select(x => (Character)x);
+            var query = myCharacter.circleQuery.Query().Select(x => (Character)x)
+                .Where(x=>(transform.position-x.transform.position).magnitude<=3f);
 
-            if (query.Where(x => x.GetType() == typeof(Slave.Slave)).Count() >= 1 
-                && Transitions.ContainsKey("OnEscort"))
-                return Transitions["OnEscort"];
-            if (query.Where(x => x.GetType() == typeof(Looter.Looter)).Count() >= 1
+            if (query.Where(x => x.GetComponent<Looter.Looter>() != null).Count() >= 1
                 && Transitions.ContainsKey("OnAttack"))
                 return Transitions["OnAttack"];
+
+            if (query.Where(x => x.GetComponent<Slave.Slave>()!=null).Count() >= 1 
+                && Transitions.ContainsKey("OnEscort"))
+                return Transitions["OnEscort"];
 
             return this;
         }

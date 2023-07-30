@@ -26,6 +26,7 @@ namespace FSM.Looter
             base.Enter(from, transitionParameters);
             animator.SetBool("isStealing", false);
             animator.SetBool("isAttacking", false);
+            animator.speed = 1;
 
             isStealing = false;
             loot = 0;

@@ -22,6 +22,7 @@ namespace FSM.Guard
             base.Enter(from, transitionParameters);
             animator.SetBool("isAttacking", false);
             animator.SetBool("isEscorting", false);
+            animator.speed = 1;
 
             if (capsule == null)
                 capsule = GetComponent<CapsuleCollider>();
@@ -72,7 +73,7 @@ namespace FSM.Guard
         }
         public void TakeDamage()
         {
-            if (target == null)
+            if (target == null || myCharacter.Health <= 0)
                 return;
 
             target.OnTakeDamage(damage);

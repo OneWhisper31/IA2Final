@@ -24,6 +24,7 @@ public class LooterRunState : MonoBaseState
             base.Enter(from, transitionParameters);
             animator.SetBool("isStealing", false);
             animator.SetBool("isAttacking", false);
+            animator.speed = 1;
             hasArrive = false;
             canSteal = false;
 

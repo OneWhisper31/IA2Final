@@ -23,6 +23,7 @@ namespace FSM.Looter
             base.Enter(from, transitionParameters);
             animator.SetBool("isStealing", false);
             animator.SetBool("isAttacking", false);
+            animator.speed = 1;
 
             if (capsule == null)
                 capsule = GetComponent<CapsuleCollider>();
@@ -77,7 +78,7 @@ namespace FSM.Looter
         }
         public void TakeDamage()
         {
-            if (target == null)
+            if (target == null || myCharacter.Health<=0)
                 return;
 
             target.OnTakeDamage(damage);

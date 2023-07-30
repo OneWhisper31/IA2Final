@@ -8,7 +8,7 @@ namespace FSM.Slave
     public class SlaveWalkState : MonoBaseState
     {
         [SerializeField] Transform house;
-        public Transform guard;
+        [HideInInspector]public Guard.Guard guard;
         CapsuleCollider capsule;
 
         List<Transform> path = new List<Transform>();
@@ -23,6 +23,7 @@ namespace FSM.Slave
         {
             base.Enter(from, transitionParameters);
             animator.SetBool("isMining", false);
+            animator.speed = 1;
 
             hasArrive = false;
 
@@ -35,20 +36,16 @@ namespace FSM.Slave
         IEnumerator SetGuard()
         {
             yield return new WaitForSecondsRealtime(0.1f);
-            var query = myCharacter.circleQuery.Query().Where(x => x.GetType() == typeof(Guard.Guard)).Cast<Guard.Guard>();
-            if (query.Count() > 0)
+            while (guard == null)
             {
-                guard= query.OrderBy(x => (transform.position - x.transform.position).magnitude).First().transform;
-            }
-            else
-            {
-                guard = house;
-                yield return new WaitForSecondsRealtime(4f);
-                query = myCharacter.circleQuery.Query().Where(x => x.GetType() == typeof(Guard.Guard)).Cast<Guard.Guard>();
+                var query = myCharacter.circleQuery.Query().Where(x => x.GetType() == typeof(Guard.Guard)).Cast<Guard.Guard>();
+
                 if (query.Count() > 0)
                 {
-                    guard = query.OrderBy(x => (transform.position - x.transform.position).magnitude).First().transform;
+                    guard = query.OrderBy(x => (transform.position - x.transform.position).magnitude).First();
+                    break;
                 }
+                yield return new WaitForSecondsRealtime(0.1f);
             }
         }
 
@@ -57,19 +54,22 @@ namespace FSM.Slave
             if (guard == null)
                 return;
 
-            if ((transform.position - guard.position).magnitude < 1f)
+            if (guard.IsDead)
             {
-                if (house == guard)
-                    return;
+                target = house;
+                return;
+            }
 
+            if ((transform.position - guard.transform.position).magnitude < 1f)
+            {
                 hasArrive = true;
                 return;
             }
 
-            if (transform.position.CanPassThrough(guard.position, capsule.radius, capsule.height, GameManager.gm.wallLayer))
+            if (transform.position.CanPassThrough(guard.transform.position, capsule.radius, capsule.height, GameManager.gm.wallLayer))
             {//if is in line of sight, clean the list and add house as target
 
-                target = guard;
+                target = guard.transform;
 
                 if (path.Count > 0)
                     path.Clear();
@@ -104,7 +104,7 @@ namespace FSM.Slave
         {//IA2-LINQ
 
             isWaitingForPath = true;
-            var nodes = myCharacter.GenerateStartNEnd(transform, guard);
+            var nodes = myCharacter.GenerateStartNEnd(transform, guard.transform);
 
             //A*
             StartCoroutine(AStar.CalculatePath(nodes.First(), (x) => x == nodes.Last(),
@@ -112,7 +112,7 @@ namespace FSM.Slave
             x => x.heuristic,
             x => {
                 path.Clear();
-                path = x.Select(x => x.transform).PrependAppend(transform, guard).ToList();//IA2-LINQ
+                path = x.Select(x => x.transform).PrependAppend(transform, guard.transform).ToList();//IA2-LINQ
                 target = path.First();
                 isWaitingForPath = false;
             }
@@ -121,7 +121,10 @@ namespace FSM.Slave
         public override IState ProcessInput()
         {
             if (hasArrive && Transitions.ContainsKey("OnGuard"))
+            {
+                hasArrive = false;
                 return Transitions["OnGuard"];
+            }
 
 
             return this;

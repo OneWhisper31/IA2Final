@@ -22,6 +22,7 @@ namespace FSM.Guard
             base.Enter(from, transitionParameters);
             animator.SetBool("isAttacking", false);
             animator.SetBool("isEscorting", true);
+            animator.speed = 1;
 
 
             slave = myCharacter.circleQuery.Query().Where(x => x.GetType() == typeof(Slave.Slave)).Cast<Slave.Slave>().First().transform;
@@ -95,9 +96,13 @@ namespace FSM.Guard
         }
         public override IState ProcessInput()
         {
-            if(slave == null && Transitions.ContainsKey("OnIdle"))
+            int lootersCount = myCharacter.circleQuery.Query().Select(x => (Character)x)
+                .Where(x => (transform.position - x.transform.position).magnitude <= 3f)
+                .Where(x => x.GetComponent<Looter.Looter>() != null).Count();
+
+            if (slave == null && Transitions.ContainsKey("OnIdle"))
                 return Transitions["OnIdle"];
-            else if (myCharacter.circleQuery.Query().Select(x => (Character)x).Where(x => x.GetType() == typeof(Looter.Looter)).Count() >= 1
+            else if (lootersCount >= 1
                 && Transitions.ContainsKey("OnAttack"))
                 return Transitions["OnAttack"];
 

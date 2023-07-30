@@ -25,6 +25,7 @@ namespace FSM.Slave
             animator.SetBool("isMining", false);
             hasArrive = false;
             hasEmptied = false;
+            animator.speed = 1;
 
             if (capsule == null)
                 capsule = GetComponent<CapsuleCollider>();
@@ -106,6 +107,7 @@ namespace FSM.Slave
             if (hasEmptied && Transitions.ContainsKey("OnEmpty"))
             {
                 animator.SetBool("isMining", false);
+                hasEmptied = false;
                 return Transitions["OnEmpty"];
             }
 

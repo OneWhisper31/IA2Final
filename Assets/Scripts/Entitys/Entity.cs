@@ -10,6 +10,7 @@ public abstract class Entity : MonoBehaviour, IDamageable, IGridEntity
     public int Health { get=>health; }
     public bool IsDead { get => health <= 0; }
     [SerializeField] int health=100;
+    protected int maxHealth;
 
     public Vector3 Position { get => transform.position; set => transform.position = value; }
 
@@ -22,6 +23,11 @@ public abstract class Entity : MonoBehaviour, IDamageable, IGridEntity
     private void Awake()
     {
         circleQuery = GetComponent<CircleQuery>();
+        
+    }
+    private void Start()
+    {
+        maxHealth = health;
     }
 
     private void Update()
@@ -46,10 +52,10 @@ public abstract class Entity : MonoBehaviour, IDamageable, IGridEntity
     {
         health += heal;
     }
-
-    public virtual void OnDeadEvent()
+    public virtual void OnFullHealEvent()
     {
-        gameObject.SetActive(false);
-        transform.position = GameManager.gm.deadPivot.position;
+        health = maxHealth;
     }
+
+    public abstract void OnDeadEvent();
 }

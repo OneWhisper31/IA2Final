@@ -8374,7 +8374,7 @@ Light:
   serializedVersion: 10
   m_Type: 1
   m_Shape: 0
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.509434, g: 0.509434, b: 0.509434, a: 1}
   m_Intensity: 2
   m_Range: 10
   m_SpotAngle: 30
@@ -8723,6 +8723,37 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!1 &424903056
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 424903057}
+  m_Layer: 3
+  m_Name: SpawnPivot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &424903057
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 424903056}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.907, y: 0, z: 1.554}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 83398805}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &432190651
 GameObject:
   m_ObjectHideFlags: 0
@@ -11164,7 +11195,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4638f661f51711458b88b07a5f52c12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  house: {fileID: 1831207019}
+  house: {fileID: 424903057}
   speed: 2
   waitTime: 2
 --- !u!114 &486240361
@@ -11181,6 +11212,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   health: 100
   circleQuery: {fileID: 486240362}
+  respawnPoint: {fileID: 1187263821}
   transitions:
   - name: Guard
     from: {fileID: 486240358}
@@ -25342,7 +25374,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 2786a7c0ef07922498f6f77ed8be7ba6,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 6.96
+      value: 7.33
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2786a7c0ef07922498f6f77ed8be7ba6,
         type: 3}
@@ -25352,7 +25384,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 2786a7c0ef07922498f6f77ed8be7ba6,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 3.53
+      value: 12.62
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2786a7c0ef07922498f6f77ed8be7ba6,
         type: 3}
@@ -39129,6 +39161,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   health: 100
   circleQuery: {fileID: 1684539798}
+  respawnPoint: {fileID: 424903057}
   transitions:
   - name: Attack
     from: {fileID: 1684539794}
@@ -39158,7 +39191,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetGrid: {fileID: 927408277}
-  radious: 1.93
+  radious: 9.43
 --- !u!95 &1684539801
 Animator:
   serializedVersion: 4
@@ -44315,6 +44348,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   health: 100
   circleQuery: {fileID: 1868235341}
+  respawnPoint: {fileID: 958750860}
   transitions:
   - name: Attack
     from: {fileID: 1868235337}

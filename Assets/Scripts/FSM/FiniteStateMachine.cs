@@ -7,7 +7,7 @@ namespace FSM {
 
     public class FiniteStateMachine {
 
-        private const int _MAX_TRANSITIONS_PER_FRAME = 3;
+        private const int _MAX_TRANSITIONS_PER_FRAME = 2;
 
         public delegate void StateEvent(IState from, IState to);
 

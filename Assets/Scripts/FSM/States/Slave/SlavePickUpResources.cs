@@ -18,7 +18,7 @@ namespace FSM.Slave
         [SerializeField]int maxCapacity = 100;
 
         bool isWaitingForPath;
-        bool isMining;
+        bool isMining, noGuard;
         int loot;
 
 
@@ -26,18 +26,40 @@ namespace FSM.Slave
         {
             base.Enter(from, transitionParameters);
             animator.SetBool("isMining", false);
+            animator.speed = 1;
 
             loot = 0;
             isMining = false;
 
-            guard = GetComponent<SlaveWalkState>().guard;
+            guard = GetComponent<SlaveWalkState>().guard.transform;
 
             if (capsule == null)
                 capsule = GetComponent<CapsuleCollider>();
         }
+        public IEnumerator CountDown()
+        {
+            int count=0;
+            while ((transform.position - guard.transform.position).magnitude > 2)
+            {
+                count++;
 
+                if (count == 50)
+                {
+                    noGuard = true;
+                    yield break;
+                }
+                yield return new WaitForSecondsRealtime(0.1f);
+            }
+        }
         public override void UpdateLoop()
         {
+            if ((transform.position - guard.transform.position).magnitude > 2)
+            {
+                StartCoroutine(CountDown());
+                return;
+            }
+
+
             if (transform.position.CanPassThrough(gold.position, capsule.radius, capsule.height, GameManager.gm.wallLayer))
             {//if is in line of sight, clean the list and add house as target
 
@@ -117,9 +139,13 @@ namespace FSM.Slave
         }
         public override IState ProcessInput()
         {
-            if ((loot >= maxCapacity || (transform.position-guard.transform.position).magnitude>5.5f)
+            if ((loot >= maxCapacity || noGuard)
                 && Transitions.ContainsKey("OnBack"))
+            {
+                noGuard = false;
+                loot = 0;
                 return Transitions["OnBack"];
+            }
 
             return this;
         }
